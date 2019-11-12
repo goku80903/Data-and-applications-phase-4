@@ -4,18 +4,71 @@ import pymysql.cursors
 
 def ViewTheTeams():
     try:
-        cur.execute("select * from TEAM;")
+        cur.execute("select TEAM.NAME,TEAM.TEAM_ID from TEAM;")
+        results = cur.fetchall()
+        teams=[]
+        for r in results:
+            team ={}
+            team['Team_ID']=r['TEAM_ID']
+            team['Name']=r['NAME']
+            team['Captain']=""
+            team['Coaches']=[]
+            team['Sponsors']=[]
+            team['Players']=[]
+            teams.append(team)
+        cur.execute("SELECT P.FIRST_NAME,P.MIDDLE_NAME,P.LAST_NAME ,C.TEAM_ID FROM PLAYER AS P , CAPTAINS AS C WHERE P.PLAYER_ID = C.CAPTAIN_ID;")
         results = cur.fetchall()
         for r in results:
-            team_id = r['TEAM_ID']
-            name = r['NAME'] 
-            Owner_name = r['OWNER_NAME'] 
-            matches_won = r['MATCHES_WON'] 
-            matches_lost = r['MATCHES_LOST'] 
-            matches_drawn = r['MATCHES_DRAWN'] 
-            matches_no = r['MATCHES_WITHOUT_A_RESULT']
-            print("TEAM_ID : ",team_id,", NAME: ",name," ,OWNER NAME: ",Owner_name," ,MATCHES WON: ",matches_won," ,MATCHES LOST: ",matches_lost," ,MATCHES DRAWN: ",matches_drawn," , MATCHES WITHOUT A RESULT: ",matches_no )
+            for j in teams:
+                if(j['Team_ID']==r['TEAM_ID']):
+                    # j['Captian']=''
+                    j['Captain']+=r['FIRST_NAME']+" "
+                    if(r['MIDDLE_NAME']):
+                        j['Captain']+=r['MIDDLE_NAME']+" "
+                    j['Captain']+=r['LAST_NAME']
 
+        cur.execute("SELECT P.FIRST_NAME,P.MIDDLE_NAME,P.LAST_NAME,P.ROLE_PLAYED ,T.TEAM_ID FROM TEAM_SUPPORT_STAFF AS P , TEAM AS T WHERE P.TEAM_ID = T.TEAM_ID AND P.ROLE_PLAYED='COACH';")
+        results = cur.fetchall()
+        for r in results:
+            for j in teams:
+                if(j['Team_ID']==r['TEAM_ID']):
+                    coach = ""
+                    coach+=r['FIRST_NAME']+" "
+                    if(r['MIDDLE_NAME']):
+                        coach+=r['MIDDLE_NAME']+" "
+                    coach+=r['LAST_NAME']
+                    j['Coaches'].append(coach)
+        cur.execute("SELECT TS.NAME , TS.TEAM_ID FROM TEAM_SPONSOR AS TS;")
+        results = cur.fetchall()
+        for r in results:
+            for j in teams:
+                if(j['Team_ID']==r['TEAM_ID']):
+                    coach = ""
+                    coach +=r['NAME']
+                    j['Sponsors'].append(coach)
+        cur.execute("SELECT P.FIRST_NAME ,P.MIDDLE_NAME,P.LAST_NAME,P.TEAM_ID FROM PLAYER AS P;")
+        results = cur.fetchall()
+        for r in results:
+            for j in teams:
+                if(j['Team_ID']==r['TEAM_ID']):
+                    coach = ""
+                    coach+=r['FIRST_NAME']+" "
+                    if(r['MIDDLE_NAME']):
+                        coach+=r['MIDDLE_NAME']+" "
+                    coach+=r['LAST_NAME']
+                    j['Players'].append(coach)
+        for j in teams:
+            print("Team ID: ",j['Team_ID']," ,Name: ",j['Name']," ,Captain: ",j['Captain'])
+            print("Coaches: ")
+            for r in j['Coaches']:
+                print("\t",r)
+            print("Sponsors: ")
+            for r in j['Sponsors']:
+                print("\t",r)
+            print("Players: ")
+            for r in j['Players']:
+                print("\t",r)
+            print()
     except Exception as e:
         code , message = e.args
         print(">>>>>>>>>>>>>>>>",code , message)
@@ -378,6 +431,15 @@ def remove_supportstaff():
         code , message = e.args
         print(">>>>>>>>>>>>>>>>",code , message)
 
+def remove_player():
+    pla = input("Enter the id of player who wants to withdraw>")
+    try:
+        cur.execute("UPDATE PLAYER SET TEAM_ID="+'NULL'+" WHERE PLAYER_ID="+pla)
+        con.commit()
+    except Exception as e:
+        code , message = e.args
+        print(">>>>>>>>>>>>>>>>",code , message)
+
 def dispatch(ch):
     """
     Function that maps helper functions to option entered
@@ -439,51 +501,50 @@ while(1):
                 db='CRICKET_TOURNAMENT',
                 cursorclass=pymysql.cursors.DictCursor)
         tmp = sp.call('clear',shell=True)
+        break
 
     except:
         tmp = sp.call('clear',shell=True)
         print("Connection Refused: Either username or password is incorrect or user doesn't have access to database")
         tmp = input("Enter any key to CONTINUE>")
 
-    if(con.open):
-        print("Connected")
-    else:
-        print("Failed to connect")
-    tmp = input("Enter any key to CONTINUE>")
+if(con.open):
+    print("Connected")
+else:
+    print("Failed to connect")
+tmp = input("Enter any key to CONTINUE>")
 
-    with con:
-        cur = con.cursor()
-        while(1):
+with con:
+    cur = con.cursor()
+    while(1):
+        tmp = sp.call('clear',shell=True)
+        print("1.View list of teams")
+        print("2.View the list of players")
+        print("3.View the match schedule")
+        print("4.View the points table")
+        print("5.View the player with most runs/most wickets")
+        print("6.Withdraw from a team")
+        print("7.Modify personal details")
+        print("8.Disqualify a player")
+        print("9.Change the stats of the player")
+        print("10.Change the stats of the team")
+        print("11.Add a new player to the tounrament")
+        print("12.Add a new team")
+        print("13.Add a new ground")
+        print("14.Buy a player")
+        print("15.Change the captain")
+        print("16.Remove the player from the team")
+        print("17.Add a support staff")
+        print("18.Remove a support staff")
+        print("19.Logout")
+        try:
+            ch = int(input("Enter Choice>"))
             tmp = sp.call('clear',shell=True)
-            print("1.View list of teams")
-            print("2.View the list of players")
-            print("3.View the match schedule")
-            print("4.View the points table")
-            print("5.View the player with most runs/most wickets")
-            print("6.Withdraw from a team")
-            print("7.Modify personal details")
-            print("8.Disqualify a player")
-            print("9.Change the stats of the player")
-            print("10.Change the stats of the team")
-            print("11.Add a new player to the tounrament")
-            print("12.Add a new team")
-            print("13.Add a new ground")
-            print("14.Buy a player")
-            print("15.Change the captain")
-            print("16.Remove the player from the team")
-            print("17.Add a support staff")
-            print("18.Remove a support staff")
-            print("19.Logout")
-            try:
-                ch = int(input("Enter Choice>"))
-                tmp = sp.call('clear',shell=True)
-                if ch==19:
-                    flag=1
-                    break
-                else:
-                    dispatch(ch)
-                    tmp = input("Enter any key to CONTINUE>")
-            except:
-                print("Invalid input")
-    if(flag):
-        break
+            if ch==19:
+                flag=1
+                break
+            else:
+                dispatch(ch)
+                tmp = input("Enter any key to CONTINUE>")
+        except:
+            print("Invalid input")
