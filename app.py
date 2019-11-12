@@ -46,7 +46,7 @@ def change_team_stats():
         matches_lost = input("MATCHES_LOST>")
         matches_drawn = input("MATCHES_DRAWN>")
         matches_withoutresults = input("MATCHES_WITHOUT_A_RESULT>")
-        cur.execute("update TEAM set  MATCHES_WON = %d  MATCHES_LOST = %d MATCHES_DRAWN = %d MATCHES_WITHOUT_A_RESULT = %d where TEAM_ID = %d",matches_won,matches_lost,matches_drawn,matches_withoutresults,team_id)
+        cur.execute("update TEAM set  MATCHES_WON = "++"  MATCHES_LOST = %d MATCHES_DRAWN = %d MATCHES_WITHOUT_A_RESULT = %d where TEAM_ID = %d",matches_won,matches_lost,matches_drawn,matches_withoutresults,team_id)
         con.commit()
         
     except pymysql.InternalError as e:    
@@ -114,9 +114,9 @@ def change_captian():
     try:
         player_id = input("PLAYER_ID>")
         team_id = input("TEAM_ID>")
-        cur.execute("update CAPTAIN set CAPTAIN_ID = %d where TEAM_ID = %d",player_id,team_id)
-        cur.commit()
-    except pymysql.InternalError as e:    
+        cur.execute("update CAPTAINS set CAPTAIN_ID = %d where TEAM_ID = %d",player_id,team_id)
+        con.commit()
+    except Exception as e:    
         code , message = e.args
         print(">>>>>>>>>>>>>>>>",code , message)
     
