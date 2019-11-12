@@ -245,24 +245,24 @@ def DeleteFromTournament():
 
 def change_player_stats():
     try:
-        player_id = input("PLAYER_ID>")
-        matches = input("MATCHES>")
-        innings_batting = input("INNINGS(BATTING)>")
-        runsscored_batting = input("RUNS_SCORED(BATTING)>")
-        avg_batting = input("AVERAGE(BATTING)>")
-        highestscore_batting = input("HIGHEST_SCORE(BATTING)>")
-        strikerate_batting = input("STRIKE_RATE(BATTING)>")
-        innings_bowling = input("INNINGS(BOWLING)>")
-        wickets_bowling = input("WICKETS_TAKEN(BOWLING)>")
-        avg_bowling = input("AVERAGE(BOWLING)>")
-        strikerate_bowling = input("STRIKE_RATE(BOWLING)>")
+        player_id = int(input("PLAYER_ID>"))
+        matches = int(input("MATCHES>"))
+        innings_batting = int(input("INNINGS(BATTING)>"))
+        runsscored_batting = int(input("RUNS_SCORED(BATTING)>"))
+        avg_batting = int(input("AVERAGE(BATTING)>"))
+        highestscore_batting = int(input("HIGHEST_SCORE(BATTING)>"))
+        strikerate_batting = int(input("STRIKE_RATE(BATTING)>"))
+        innings_bowling = int(input("INNINGS(BOWLING)>"))
+        wickets_bowling = int(input("WICKETS_TAKEN(BOWLING)>"))
+        avg_bowling = int(input("AVERAGE(BOWLING)>"))
+        strikerate_bowling = int(input("STRIKE_RATE(BOWLING)>"))
         bestfig_bowling = input("BEST_FIGURES(BOWLING)>")
-        innings_fielding = input("INNINGS(FIELDING)>")
-        catches_fielding = input("CATCHES(FIELDING)>")
-        runouts_fielding = input("RUN_OUTS(FIELDING)>")
+        innings_fielding = int(input("INNINGS(FIELDING)>"))
+        catches_fielding = int(input("CATCHES(FIELDING)>"))
+        runouts_fielding = int(input("RUN_OUTS(FIELDING)>"))
         capstatus = input("CAPPED_STATUS>")
-        matchfee = input("MATCH_FEE>")
-        autionedprice = input("AUCTIONED_PRICE>")
+        matchfee = int(input("MATCH_FEE>"))
+        autionedprice = int(input("AUCTIONED_PRICE>"))
         cur.execute("update PLAYER set MATCHES(BATTING) = "+matches+", INNINGS(BATTING) = "+innings_batting+", RUNS_SCORED(BATTING) = "+runsscored_batting+", AVERAGE(BATTING) = "+avg_batting+", HIGHEST_SCORE(BATTING) = "+highestscore_batting+", STRIKE_RATE(BATTING) = "+strikerate_batting+", MATCHES(BOWLING) = "+matches+", INNINGS(BOWLING) = "+innings_bowling+", WICKETS_TAKEN(BOWLING) = "+wickets_bowling+", AVERAGE(BOWLING) = "+avg_bowling+", STRIKE_RATE(BOWLING) = "+strikerate_bowling+", BEST_FIGURE(BOWLING) = "+bestfig_bowling+", MATCHES(FIELDING) = "+matches+", INNINGS(FIELDING) = "+innings_fielding+", CATCHES(FIELDING) = "+catches_fielding+", RUN_OUTS(FIELDING) = "+runouts_fielding+", CAPPED_STATUS = "+capstatus+",MATCH_FEE = "+matchfee+", AUCTIONED_PRICE = "+autionedprice+" where PLAYER_ID = "+player_id)
         con.commit()
     
@@ -272,11 +272,11 @@ def change_player_stats():
 
 def change_team_stats():
     try:
-        team_id = input("TEAM_ID>")
-        matches_won = input("MATCHES_WON>")
-        matches_lost = input("MATCHES_LOST>")
-        matches_drawn = input("MATCHES_DRAWN>")
-        matches_withoutresults = input("MATCHES_WITHOUT_A_RESULT>")
+        team_id = int(input("TEAM_ID>"))
+        matches_won = int(input("MATCHES_WON>"))
+        matches_lost = int(input("MATCHES_LOST>"))
+        matches_drawn = int(input("MATCHES_DRAWN>"))
+        matches_withoutresults = int(input("MATCHES_WITHOUT_A_RESULT>"))
         cur.execute("update TEAM set  MATCHES_WON = "+matches_won+"  MATCHES_LOST = "+matches_lost+" MATCHES_DRAWN = "+matches_drawn+" MATCHES_WITHOUT_A_RESULT = "+matches_withoutresults+" where TEAM_ID = "+team_id)
         con.commit()
         
@@ -286,7 +286,7 @@ def change_team_stats():
 
 def add_new_player():
     try:
-        player_id = input("PLAYER_ID>")
+        player_id = int(input("PLAYER_ID>"))
         fname = input("FIRST_NAME>")
         mname = input("MIDDLE_NAME>")
         lname = input("LAST_NAME>")
@@ -304,7 +304,7 @@ def add_new_team():
     try:
         name = input("NAME>")
         owner = input("OWNER_NAME>")
-        team_id = input("TEAM_ID>")
+        team_id = int(input("TEAM_ID>"))
         cur.execute("insert into TEAM(TEAM_ID,NAME, OWNER_NAME, MATCHES_WON , MATCHES_LOST , MATCHES_DRAWN , MATCHES_WITHOUT_A_RESULT) values ("+team_id+", "+name+" , "+owner+" , 0, 0, 0, 0)")
         con.commit()
     except Exception as e:    
@@ -313,13 +313,13 @@ def add_new_team():
         
 def add_new_ground():
     try:
-        ground_id = input("GROUND_ID>")
+        ground_id = int(input("GROUND_ID>"))
         name = input("NAME>")
         location = input("LOCATION>")
-        capacity = input("CAPACITY>")
-        no_of_available_pitches = input("NO_OF_AVAILABLE_PITCHES>")
-        longest_boundary = input("LONGEST_BOUNDARY>")
-        team_id = input("TEAM_ID>")
+        capacity = int(input("CAPACITY>"))
+        no_of_available_pitches = int(input("NO_OF_AVAILABLE_PITCHES>"))
+        longest_boundary = int(input("LONGEST_BOUNDARY>"))
+        team_id = int(input("TEAM_ID>"))
         cur.execute("insert into GROUND(GROUND_ID , NAME , LOCATION , CAPACITY , LONGEST_BOUNDARY , TEAM_ID ) values ("+ground_id+","+name+","+location+","+capacity+","+longest_boundary+","+team_id+")")
         for i in (0,no_of_available_pitches):
             pitch = input("Pitch type : ")
@@ -331,11 +331,11 @@ def add_new_ground():
         
 def buy_player():
     try:
-        player_id = input("PLAYER_ID>")
-        team_id = input("TEAM_ID>")
-        price = input("AUCTIONED_PRICE>")
-        salary = input("MATCH_FEE>")
-        cur.execute("update PLAYER set TEAM_ID = "+team_id+", AUCTIONED_PRICE = "+price+" ,MATCH_FEE = "+salary+" where PLAYER_ID = "+player_id+")
+        player_id = int(input("PLAYER_ID>"))
+        team_id = int(input("TEAM_ID>"))
+        price = int(input("AUCTIONED_PRICE>"))
+        salary = int(input("MATCH_FEE>"))
+        cur.execute("update PLAYER set TEAM_ID = "+team_id+", AUCTIONED_PRICE = "+price+" ,MATCH_FEE = "+salary+" where PLAYER_ID = "+player_id)
         con.commit()
     except Exception as e:    
         code , message = e.args
@@ -343,8 +343,8 @@ def buy_player():
     
 def change_captian():
     try:
-        player_id = input("PLAYER_ID>")
-        team_id = input("TEAM_ID>")
+        player_id = int(input("PLAYER_ID>"))
+        team_id = int(input("TEAM_ID>"))
         cur.execute("update CAPTAINS set CAPTAIN_ID ="+player_id+" where TEAM_ID ="+team_id)
         con.commit()
     except Exception as e:    
@@ -352,15 +352,15 @@ def change_captian():
         print(">>>>>>>>>>>>>>>>",message)
 def add_supportstaff():
     try:
-        staff_id = input("STAFF_ID>")
+        staff_id = int(input("STAFF_ID>"))
         Fname = input("FIRST_NAME>")
         Mname = input("MIDDLE_NAME>")
         Lname = input("LAST_NAME>")
-        salary = input("SALARY>")
+        salary = int(input("SALARY>"))
         role_played = input("ROLE_PLAYED")
         coach_type = input("COACH_TYPE>")
         field_advising = input("FIELD_ADVISING>")
-        team_id = input("TEAM_ID>")
+        team_id = int(input("TEAM_ID>"))
         cur.execute("insert into TEAM_SUPPORT_STAFF(STAFF_ID,TEAM_ID,FIRST_NAME,MIDDLE_NAME,LAST_NAME,SALARY,ROLE_PLAYED,COACH_TYPE,FIELD_ADVISING) values (%d,%d,%s,%s,%s,%d,%s,%s,%s)",staff_id,team_id,Fname,Mname,Lname,salary,role_played,coach_type,field_advising)
         con.commit()
     except Exception as e:    
@@ -369,8 +369,8 @@ def add_supportstaff():
 
 def remove_supportstaff():
     try:
-        staff_id = input("STAFF_ID>")
-        team_id = input("TEAM_ID>")
+        staff_id = int(input("STAFF_ID>"))
+        team_id = int(input("TEAM_ID>"))
         cur.execute("delete from TEAM_SUPPORT_STAFF where STAFF_ID = %d and TEAM_ID = %d",staff_id,team_id)
         con.commit()
     except Exception as e:    
