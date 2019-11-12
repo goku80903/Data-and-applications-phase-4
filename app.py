@@ -402,7 +402,7 @@ def buy_player():
         cur.execute("select PLAYER_ID , TEAM_ID from PLAYER")
         result = cur.fetchall()
         for r in result:
-            if(r['PLAYER_ID']==player_id and r['TEAM_ID']==team_id):
+            if(r['PLAYER_ID']==int(player_id) and r['TEAM_ID']==int(team_id)):
                 flag = 1
                 cur.execute("update PLAYER set TEAM_ID = "+team_id+", AUCTIONED_PRICE = "+price+" ,MATCH_FEE = "+salary+" where PLAYER_ID = "+player_id)
                 con.commit()
@@ -420,7 +420,7 @@ def change_captian():
         cur.execute("select PLAYER_ID , TEAM_ID from PLAYER")
         result = cur.fetchall()
         for r in result:
-            if(r['PLAYER_ID']==player_id and r['TEAM_ID']==team_id):
+            if(r['PLAYER_ID']==int(player_id) and r['TEAM_ID']==int(team_id)):
                 flag = 1
                 cur.execute("update CAPTAINS set CAPTAIN_ID ="+player_id+" where TEAM_ID ="+team_id)
                 con.commit()
@@ -430,6 +430,7 @@ def change_captian():
     except Exception as e:    
         message = e.args
         print(">>>>>>>>>>>>>>>>",message)
+
 def add_supportstaff():
     try:
         staff_id = smfg(input("STAFF_ID>"))
@@ -441,7 +442,7 @@ def add_supportstaff():
         coach_type = smtg(input("COACH_TYPE>"))
         field_advising = smtg(input("FIELD_ADVISING>"))
         team_id = smfg(input("TEAM_ID>"))
-        cur.execute("insert into TEAM_SUPPORT_STAFF(STAFF_ID,TEAM_ID,FIRST_NAME,MIDDLE_NAME,LAST_NAME,SALARY,ROLE_PLAYED,COACH_TYPE,FIELD_ADVISING) values (%d,%d,%s,%s,%s,%d,%s,%s,%s)",staff_id,team_id,Fname,Mname,Lname,salary,role_played,coach_type,field_advising)
+        cur.execute("insert into TEAM_SUPPORT_STAFF(STAFF_ID,TEAM_ID,FIRST_NAME,MIDDLE_NAME,LAST_NAME,SALARY,ROLE_PLAYED,COACH_TYPE,`FIELD ADVISING`) values ("+staff_id+","+team_id+","+Fname+","+Mname+","+Lname+","+salary+","+role_played+","+coach_type+","+field_advising+")")
         con.commit()
     except Exception as e:    
         code , message = e.args
@@ -455,9 +456,9 @@ def remove_supportstaff():
         cur.execute("select STAFF_ID , TEAM_ID from TEAM_SUPPORT_STAFF")
         result = cur.fetchall()
         for r in result:
-            if(r['STAFF_ID']== staff_id and r['TEAM_ID']==team_id):
+            if(r['STAFF_ID']== int(staff_id) and r['TEAM_ID']==int(team_id)):
                 flag = 1
-                cur.execute("delete from TEAM_SUPPORT_STAFF where STAFF_ID = %d and TEAM_ID = %d",staff_id,team_id)
+                cur.execute("delete from TEAM_SUPPORT_STAFF where STAFF_ID ="+staff_id+" and TEAM_ID = "+team_id)
                 con.commit()
         if(flag==0):
             print("staff doesn't belong to team or either staff or team doesn't exist")
@@ -466,13 +467,23 @@ def remove_supportstaff():
         print(">>>>>>>>>>>>>>>>",code , message)
 
 def remove_player():
-    pla = input("Enter the id of player who wants to withdraw>")
     try:
-        cur.execute("UPDATE PLAYER SET TEAM_ID="+'NULL'+" WHERE PLAYER_ID="+pla)
-        con.commit()
+        pla = input("Enter the player you want to delete from the tournament>")
+        cur.execute("SELECT CAPTAIN_ID FROM CAPTAINS;")
+        results = cur.fetchall()
+        captain = 0
+        for r in results:
+            if int(pla)==r['CAPTAIN_ID']:
+                captain=1
+        if (captain!=1):
+            cur.execute("DELETE FROM PLAYER WHERE PLAYER_ID="+pla)
+            con.commit()
+        else:
+            print("The player is a captain and cannot be removed")
+            
     except Exception as e:
-        code , message = e.args
-        print(">>>>>>>>>>>>>>>>",code , message)
+        message = e.args
+        print(">>>>>>>>>>>>>>>>",message)
 
 def dispatch(ch):
     """
