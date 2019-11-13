@@ -182,8 +182,16 @@ def ViewThePlayerhigh():
 def WithdrawFromTeam():
     pla = input("Enter the id of player who wants to withdraw>>>>>")
     try:
-        cur.execute("UPDATE PLAYER SET TEAM_ID="+'NULL'+" WHERE PLAYER_ID="+pla)
-        con.commit()
+        flag =0
+        cur.execute("select PLAYER_ID , TEAM_ID from PLAYER")
+        result = cur.fetchall()
+        for r in result:
+            if(r['PLAYER_ID']==int(pla)):
+                flag = 1
+                cur.execute("UPDATE PLAYER SET TEAM_ID="+'NULL'+" WHERE PLAYER_ID="+pla)
+                con.commit()
+        if(flag==0):
+            print("player doesn't exist")
     except Exception as e:
         code , message = e.args
         print(">>>>>>>>>>>>>>>>",code , message)
@@ -326,7 +334,7 @@ def change_player_stats():
         capstatus = smfg(input("CAPPED_STATUS>"))
         matchfee = smfg(input("MATCH_FEE>"))
         autionedprice = smfg(input("AUCTIONED_PRICE>"))
-        cur.execute("update PLAYER set `MATCHES(BATTING)` = "+matches+", `INNINGS(BATTING)` = "+innings_batting+", `RUNS_SCORED(BATTING)` = "+runsscored_batting+", `AVERAGE(BATTING)` = "+avg_batting+", `HIGHEST_SCORE(BATTING)` = "+highestscore_batting+", `STRIKE_RATE(BATTING)` = "+strikerate_batting+", `MATCHES(BOWLING)` = "+matches+", `INNINGS(BOWLING)` = "+innings_bowling+", `WICKETS_TAKEN(BOWLING)` = "+wickets_bowling+", `AVERAGE(BOWLING)` = "+avg_bowling+", `STRIKE_RATE(BOWLING)` = "+strikerate_bowling+", `BEST_FIGURE(BOWLING)` = '"+bestfig_bowling+"', `MATCHES(FIELDING)` = "+matches+", `INNINGS(FIELDING)` = "+innings_fielding+", `CATCHES(FIELDING)` = "+catches_fielding+", `RUN_OUTS(FIELDING)` = "+runouts_fielding+", CAPPED_STATUS = '"+capstatus+"',MATCH_FEE = "+matchfee+", AUCTIONED_PRICE = "+autionedprice+" where PLAYER_ID = "+player_id)
+        cur.execute("update PLAYER set `MATCHES(BATTING)` = "+matches+", `INNINGS(BATTING)` = "+innings_batting+", `RUNS(BATTING)` = "+runsscored_batting+", `AVERAGE(BATTING)` = "+avg_batting+", `HIGHEST_SCORE(BATTING)` = "+highestscore_batting+", `STRIKE_RATE(BATTING)` = "+strikerate_batting+", `MATCHES(BOWLING)` = "+matches+", `INNINGS(BOWLING)` = "+innings_bowling+", `WICKETS_TAKEN(BOWLING)` = "+wickets_bowling+", `AVERAGE(BOWLING)` = "+avg_bowling+", `STRIKE_RATE(BOWLING)` = "+strikerate_bowling+", `BEST_FIGURES(BOWLING)` = "+bestfig_bowling+", `MATCHES(FIELDING)` = "+matches+", `INNINGS(FIELDING)` = "+innings_fielding+", `CATCHES(FIELDING)` = "+catches_fielding+", `RUN_OUTS(FIELDING)` = "+runouts_fielding+", CAPPED_STATUS = '"+capstatus+"',MATCH_FEE = "+matchfee+", AUCTIONED_PRICE = "+autionedprice+" where PLAYER_ID = "+player_id)
         con.commit()
     
     except Exception as e:
@@ -340,7 +348,7 @@ def change_team_stats():
         matches_lost = smfg(input("MATCHES_LOST>"))
         matches_drawn = smfg(input("MATCHES_DRAWN>"))
         matches_withoutresults = smfg(input("MATCHES_WITHOUT_A_RESULT>"))
-        cur.execute("update TEAM set  MATCHES_WON = "+matches_won+"  MATCHES_LOST = "+matches_lost+" MATCHES_DRAWN = "+matches_drawn+" MATCHES_WITHOUT_A_RESULT = "+matches_withoutresults+" where TEAM_ID = "+team_id)
+        cur.execute("update TEAM set  MATCHES_WON = "+matches_won+" , MATCHES_LOST = "+matches_lost+", MATCHES_DRAWN = "+matches_drawn+" ,MATCHES_WITHOUT_A_RESULT = "+matches_withoutresults+" where TEAM_ID = "+team_id)
         con.commit()
         
     except Exception as e:    
@@ -380,12 +388,13 @@ def add_new_ground():
         name = smtg(input("NAME>"))
         location = smtg(input("LOCATION>"))
         capacity = smfg(input("CAPACITY>"))
-        no_of_available_pitches = smfg(input("NO_OF_AVAILABLE_PITCHES>"))
+        no_of_available_pitches = int(input("NO_OF_AVAILABLE_PITCHES>"))
         longest_boundary = smfg(input("LONGEST_BOUNDARY>"))
         team_id = smfg(input("TEAM_ID>"))
         cur.execute("insert into GROUND(GROUND_ID , NAME , LOCATION , CAPACITY , LONGEST_BOUNDARY , TEAM_ID ) values ("+ground_id+","+name+","+location+","+capacity+","+longest_boundary+","+team_id+")")
-        for i in (0,no_of_available_pitches):
-            pitch = input("Pitch type : ")
+        for i in range(0,no_of_available_pitches):
+            # print(i)
+            pitch = smtg(input("Pitch type : "))
             cur.execute("insert into AVAILABLE_PITCHES(GROUND_ID ,PITCH_TYPE ) values ("+ground_id+","+pitch+")")
             con.commit()
     except Exception as e:    
@@ -399,13 +408,16 @@ def buy_player():
         price = smfg(input("AUCTIONED_PRICE>"))
         salary = smfg(input("MATCH_FEE>"))
         flag =0
-        cur.execute("select PLAYER_ID , TEAM_ID from PLAYER")
+        cur.execute("select PLAYER_ID from PLAYER")
         result = cur.fetchall()
+        cur.execute("select TEAM_ID from TEAM")
+        res = cur.fetchall()
         for r in result:
-            if(r['PLAYER_ID']==int(player_id) and r['TEAM_ID']==int(team_id)):
-                flag = 1
-                cur.execute("update PLAYER set TEAM_ID = "+team_id+", AUCTIONED_PRICE = "+price+" ,MATCH_FEE = "+salary+" where PLAYER_ID = "+player_id)
-                con.commit()
+            for rr in res:
+                if(r['PLAYER_ID']==int(player_id) and rr['TEAM_ID']==int(team_id)):
+                    flag = 1
+                    cur.execute("update PLAYER set TEAM_ID = "+team_id+", AUCTIONED_PRICE = "+price+" ,MATCH_FEE = "+salary+" where PLAYER_ID = "+player_id)
+                    con.commit()
         if(flag==0):
             print("The player or team doesn't exist")
     except Exception as e:    
@@ -509,8 +521,6 @@ def dispatch(ch):
     elif(ch==9):
         change_player_stats()
         # change_player_stats(player_id,matches,innings_batting,runsscored_batting,avg_batting,highestscore_batting,strikerate_batting,innings_bowling,wickets_bowling,avg_bowling,strikerate_bowling,bestfig_bowling,innings_fielding,catches_fielding,runouts_fielding,capstatus,matchfee,autionedprice)
-    elif(ch==10):
-        change_team_stats()
     elif(ch==10):
         change_team_stats()
     elif(ch==11):
